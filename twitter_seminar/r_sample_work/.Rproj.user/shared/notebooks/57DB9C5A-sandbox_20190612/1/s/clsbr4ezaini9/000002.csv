@@ -1,0 +1,4 @@
+"0","B1_summary <- B1_orig %>%"
+"0","  group_by(cluster) %>%"
+"0","  summarize_all(mean) %>%"
+"0","  ungroup()"

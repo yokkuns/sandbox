@@ -1,0 +1,24 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1561106230075.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1946630752",
+    "id" : "42069F81",
+    "lastKnownWriteTime" : 1561107594,
+    "last_content_update" : 1561107594565,
+    "path" : "~/work/github/yokkuns/sandbox/twitter_seminar/r_sample_work/sandbox_20190621.Rmd",
+    "project_path" : "sandbox_20190621.Rmd",
+    "properties" : {
+        "chunk_output_type" : "inline",
+        "cursorPosition" : "78,0",
+        "scrollLine" : "76",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

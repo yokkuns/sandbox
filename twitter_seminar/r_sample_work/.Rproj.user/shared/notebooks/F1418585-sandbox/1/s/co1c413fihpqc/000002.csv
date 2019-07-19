@@ -1,0 +1,4 @@
+"0","fit <- rpart(TW~., data = A)
+"
+"2"," eval(predvars, data, env) でエラー:  オブジェクト 'TW' がありません 
+"

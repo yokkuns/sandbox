@@ -1,0 +1,4 @@
+"0","write_csv(UA, ""UA_output.csv"")
+"
+"2"," is.data.frame(x) でエラー:  オブジェクト 'UA' がありません 
+"

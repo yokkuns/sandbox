@@ -1,0 +1,14 @@
+"0","B1_summary_gather2 <- B1_summary_gather %>%
+  group_by(Q3TW) %>%
+  mutate(
+    ans_sd = sd(ans)
+  ) %>%
+  ungroup() %>%
+  arrange(cluster, desc(ans_sd)) %>%
+  mutate(
+    Q3TW = factor(Q3TW, levels = distinct(Q3TW))
+  )
+"
+"2"," mutate_impl(.data, dots) でエラー: 
+  Evaluation error:  'distinct_' をクラス ""character"" のオブジェクトに適用できるようなメソッドがありません .
+"

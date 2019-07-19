@@ -1,0 +1,92 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(readr)
+library(rpart)
+library(partykit)
+```
+
+
+```{r}
+A <- read_csv("2017UA_sample_data.csv")
+```
+
+```{r}
+head(A)
+```
+
+
+
+```{r}
+A <- A %>%
+  mutate(
+    gender = ifelse(CELL <= 10, "M", "F"),
+    generation = ifelse(CELL <= 10, CELL, CELL - 10),
+    Q4F_log10 = log10(Q4F),
+    Q4FW_log10 = log10(Q4FW)
+  ) %>%
+  select(-CELL)
+```
+
+```{r}
+head(A)
+```
+
+
+```{r}
+fit <- rpart(Q1TW~., data = A)
+```
+
+
+
+```{r}
+plot(as.party(fit))
+```
+
+
+```{r}
+ggplot(A, aes(x = Q4F_log10)) +
+  geom_histogram()
+```
+
+
+```{r}
+ggplot(A, aes(x = Q4FW_log10)) +
+  geom_histogram()
+```
+
+
+```{r}
+ggplot(A, aes(x = factor(Q1TW), y = Q4F_log10)) +
+  geom_boxplot()
+```
+
+```{r}
+names(A)
+```
+
+```{r}
+B <- A %>%
+  select(-Q1FB, -Q1IN)
+```
+
+```{r}
+fit <- rpart(Q1TW~., data = B)
+plot(as.party(fit))
+```
+
+```{r}
+fit <- rpart(Q2TW~., data = A %>% select(-Q4F, -Q4FW))
+plot(as.party(fit))
+```
+
+```{r}
+summary(A)
+```
+
+
+

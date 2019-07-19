@@ -1,0 +1,7 @@
+"0","B <- read_csv(""CELL_master.csv"", locale = locale(encoding = ""UTF-8""))
+"
+"2","Parsed with column specification:
+cols(
+  `CELL	gender_generation` = col_character()
+)
+"

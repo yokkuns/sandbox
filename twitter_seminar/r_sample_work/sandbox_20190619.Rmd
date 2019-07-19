@@ -1,0 +1,212 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(readr)
+library(readxl)
+library(rpart)
+library(partykit)
+```
+
+```{r}
+ad_data <- read_excel("TW-Ad-performance-data.xlsx")
+```
+
+```{r}
+head(ad_data)
+```
+
+
+```{r}
+names(ad_data)
+```
+
+
+```{r}
+for(i in 5:(ncol(ad_data)-1)){
+  ad_data[[i]] <- as.numeric(ad_data[[i]])
+}
+```
+
+```{r}
+summary(ad_data)
+```
+
+
+```{r}
+plot(ad_data[,5:(ncol(ad_data)-1)])
+```
+
+
+```{r}
+ad_data <- ad_data %>%
+  select(-Video, -`Still image`)
+sort(cor(na.omit(ad_data[,5:(ncol(ad_data)-1)]))[14,], decreasing = T)
+```
+
+
+
+```{r}
+imp_df <- ad_data[,c("インプレッション")] %>%
+  arrange(desc(`インプレッション`)) %>%
+  mutate(
+    rank = 1:n()
+  )
+ggplot(imp_df, aes(x = rank, y = `インプレッション`)) +
+  geom_line() +
+  geom_point() +
+  theme_bw(base_family = "Osaka")
+```
+
+
+```{r}
+names(ad_data)
+```
+
+```{r}
+df <- ad_data[,-c(1:4,19)]
+```
+
+
+
+```{r}
+fit <- rpart(`ツイートのエンゲージメント率`~., data = df)
+```
+
+```{r}
+plot(as.party(fit), gp = gpar(fontfamily = "Osaka"))
+```
+
+```{r}
+ggplot(df, aes(x = log10(`インプレッション`), y = `ツイートのエンゲージメント率`)) +
+  geom_point() +
+  theme_bw(base_family = "Osaka")
+```
+
+```{r}
+ggplot(df, aes(x = `ツイートのエンゲージメント率`)) +
+  geom_histogram() +
+  theme_bw(base_family = "Osaka")
+```
+
+```{r}
+df2 <- df %>%
+  mutate(
+    `ツイート投稿` = `ツイート投稿率` * `インプレッション`,
+    `いいね` = `いいね率` * `インプレッション`,
+    `リツイート` = `リツイート率` * `インプレッション`,
+    `プロフィールへのアクセス` = `プロフィールへのアクセス率` * `インプレッション`,
+    `返信` = `返信率` * `インプレッション`
+  ) %>%
+  select(`ツイート投稿`, `いいね`, `リツイート`, `プロフィールへのアクセス`, `返信`)
+```
+
+```{r}
+df2 <- df2 / rowSums(df2)
+```
+
+
+```{r}
+par(family = "Osaka")
+plot(df2)
+```
+
+
+```{r}
+df2_pc <- as.data.frame(prcomp(na.omit(df2), scale. = T)$x)
+```
+
+```{r}
+head(df2_pc)
+```
+
+```{r}
+plot(df2_pc)
+```
+
+
+
+```{r}
+df2_km <- kmeans(df2_pc, 2)
+```
+```{r}
+df2 <- na.omit(df2)
+```
+
+```{r}
+df2$cluster <- as.factor(df2_km$cluster)
+```
+
+```{r}
+par(family = "Osaka")
+plot(df2 %>% select(-cluster), col=df2$cluster)
+```
+
+```{r}
+df2_gather <- df2 %>%
+  gather(key = "action", value = "value", -cluster)
+```
+
+
+```{r}
+head(df2_gather)
+```
+
+```{r}
+df2_gather_summary <- df2_gather %>%
+  group_by(cluster, action) %>%
+  summarise(
+    value = mean(value)
+  ) %>%
+  ungroup()
+```
+
+
+```{r}
+ggplot(df2_gather_summary, aes(x = action, y = value, col = cluster, group = cluster)) +
+  geom_line() +
+  geom_point() +
+  theme_bw(base_family = "Osaka")
+```
+
+
+```{r}
+df3 <- df %>%
+  na.omit() %>%
+  mutate(
+    imp_log10 = log10(`インプレッション`)
+  ) %>%
+  select(imp_log10, `ツイートのエンゲージメント率`)
+```
+
+```{r}
+df3_scale <- scale(df3)
+```
+
+```{r}
+df3_scale_km <- kmeans(df3_scale, 4)
+```
+
+
+```{r}
+df3$cluster <- as.factor(df3_scale_km$cluster)
+```
+
+```{r}
+ggplot(df3, aes(x = imp_log10, y = `ツイートのエンゲージメント率`, col = cluster)) +
+  geom_point() +
+  theme_bw(base_family = "Osaka")
+```
+
+
+```{r}
+df3 %>%
+  group_by(cluster) %>%
+  summarise_all(mean) %>%
+  ungroup() %>%
+  mutate(imp = 10^imp_log10)
+```
+

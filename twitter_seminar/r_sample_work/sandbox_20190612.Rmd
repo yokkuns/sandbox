@@ -1,0 +1,225 @@
+---
+title: "Untitled"
+author: "里 洋平"
+date: "2019年6月12日"
+output: html_document
+---
+
+
+```{r}
+library(tidyverse)
+library(readr)
+library(rpart)
+library(partykit)
+```
+
+## データの読み込み
+```{r}
+A <- read_csv("2017UA_sample_data.csv")
+B <- read_csv("CELL_master.csv", locale = locale(encoding = "UTF-8"))
+```
+
+## データの確認
+```{r}
+dim(A)
+```
+
+
+
+```{r}
+head(A)
+```
+
+
+```{r}
+summary(A)
+```
+
+```{r}
+head(B)
+```
+
+
+## データ加工
+良いほど大きい数字にしたい
+```{r}
+A <- A %>%
+  mutate(
+    Q1TW = abs(Q1TW - 11),
+    Q1FB = abs(Q1FB - 11),
+    Q1IN = abs(Q1IN - 11)
+  )
+```
+
+
+```{r}
+head(A)
+```
+
+
+```{r}
+A <- na.omit(A)
+```
+
+```{r}
+dim(A)
+```
+
+```{r}
+A <- A %>%
+  mutate(
+    CELL = factor(CELL)
+  )
+```
+
+
+
+```{r}
+fit <- rpart(Q1TW~., data = A)
+plot(as.party(fit))
+```
+
+```{r}
+names(A)
+```
+
+
+```{r}
+B1 <- A[, sprintf("Q3TW.%s", 1:29)]
+B2 <- A[, sprintf("Q3FB.%s", 1:29)]
+B3 <- A[, sprintf("Q3IN.%s", 1:29)]
+```
+
+
+
+
+```{r}
+B1_orig <- B1
+B1 <- B1 / rowSums(B1+1)
+B1_pc <- prcomp(B1)
+```
+
+```{r}
+summary(B1_pc)
+```
+
+```{r}
+biplot(B1_pc)
+```
+
+
+```{r}
+B1_pc_df <- as.data.frame(B1_pc$x)
+
+set.seed(71)
+B1_km <- kmeans(B1_pc_df, 3)
+
+B1_pc_df$cluster <- as.factor(B1_km$cluster)
+```
+
+```{r}
+ggplot(B1_pc_df, aes(x = PC1, y = PC3, col = cluster)) +
+  geom_point()
+```
+
+```{r}
+B1_orig$cluster <- B1_pc_df$cluster
+```
+
+```{r}
+table(B1_orig$cluster)
+```
+
+
+```{r}
+B1_summary <- B1_orig %>%
+  group_by(cluster) %>%
+  summarize_all(mean) %>%
+  ungroup()
+```
+
+```{r}
+B1_summary
+```
+
+```{r}
+write_csv(B1_summary, "B1_summary.csv")
+```
+
+```{r}
+B1_summary_gather <- B1_summary %>%
+  gather("Q3TW", "ans", -cluster)
+```
+
+```{r}
+head(B1_summary_gather)
+```
+
+```{r}
+B1_summary_gather2 <- B1_summary_gather %>%
+  group_by(Q3TW) %>%
+  mutate(
+    ans_sd = sd(ans)
+  ) %>%
+  ungroup() %>%
+  arrange(cluster, desc(ans_sd)) %>%
+  mutate(
+    Q3TW = factor(Q3TW, levels = unique(Q3TW))
+  )
+```
+
+```{r}
+head(B1_summary_gather2)
+```
+
+```{r}
+ggplot(B1_summary_gather2, aes(x = Q3TW, y = ans, col = cluster, group = cluster)) +
+  geom_line()
+```
+
+```{r}
+B1_summary_gather3 <- B1_summary_gather %>%
+  group_by(Q3TW) %>%
+  mutate(
+    ans_sd = sd(ans)
+  ) %>%
+  ungroup() %>%
+  arrange(cluster, desc(ans))
+```
+
+
+```{r}
+B1_summary_gather3 %>%
+  filter(cluster == "3") %>%
+  arrange(desc(ans))
+```
+
+```{r}
+hist(A$Q1TW)
+```
+
+```{r}
+tmp <- dist(A[,sprintf("Q3TW.%s", 1:29)])
+fit <- hclust(
+  tmp
+)
+
+fit
+```
+
+
+```{r}
+plot(fit)
+rect.hclust(fit, k = 5, border = "red")
+rect.hclust(fit, h = 3, which = 3, border = "blue")
+```
+
+
+
+```{r}
+plot(cut(as.dendrogram(fit), h=4.5)$upper, main="Upper tree")
+```
+
+
+
+

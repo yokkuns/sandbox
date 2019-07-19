@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1559985615980.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "1C7A9F8",
+    "lastKnownWriteTime" : 1560307226,
+    "last_content_update" : 1560307226854,
+    "path" : "~/work/github/yokkuns/sandbox/twitter_seminar/r_sample_work/create_data.R",
+    "project_path" : "create_data.R",
+    "properties" : {
+        "cursorPosition" : "13,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
