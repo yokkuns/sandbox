@@ -1,4 +1,0 @@
-"0","df2_pc <- as.data.frame(prcomp(df2, scale. = T)$x)
-"
-"2"," svd(x, nu = 0, nv = k) でエラー:  'x' に無限値か欠測値があります 
-"

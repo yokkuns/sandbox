@@ -1,5 +1,0 @@
-"0","B1 <- B1 / rowSums(B1+1)
-B1_pc <- prcomp(B1)
-"
-"2"," svd(x, nu = 0, nv = k) でエラー: infinite or missing values in 'x'
-"

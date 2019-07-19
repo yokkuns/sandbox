@@ -1,0 +1,100 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(scales)
+library(readxl)
+```
+
+
+```{r}
+theme_set(theme_bw(base_family = "Osaka"))
+```
+
+
+## データの読み込み
+```{r}
+ad_data <- read_excel("TW-Ad-performance-data.xlsx")
+```
+
+```{r}
+ad_data
+```
+
+```{r}
+names(ad_data)
+```
+
+```{r}
+ad_data %>%
+  summarise(
+    cpn = n_distinct(`キャンペーンID`),
+    adg = n_distinct(`広告グループID`),
+    video = sum(Video, na.rm = T),
+    still_image = sum(`Still image`, na.rm = T)
+  )
+```
+
+## データ加工
+
+分析対象を静止画に限定する
+
+```{r}
+img_ad <- ad_data %>%
+  filter(!is.na(`Still image`)) %>%
+  select(`ツイートID`, `キャンペーンID`, `広告グループID`, `インプレッション`,
+         `ツイート投稿率`, `メディアのエンゲージメント率`, `いいね率`, 
+         `リツイート率`, `プロフィールへのアクセス率`, `返信率`, `ツイートのエンゲージメント率`)
+```
+
+```{r}
+img_ad
+```
+
+```{r}
+as.numeric(img_ad[["ツイート投稿率"]])
+```
+
+```{r}
+img_ad <- img_ad %>%
+  filter(`インプレッション` > 0)
+```
+
+```{r}
+as.numeric(img_ad[["ツイート投稿率"]])
+```
+
+```{r}
+for(i in 4:ncol(img_ad)){
+  if(class(img_ad[[i]]) == "character"){
+    img_ad[[i]] <- as.numeric(img_ad[[i]])
+  }
+}
+```
+
+```{r}
+img_ad
+```
+
+
+```{r}
+par(family = "Osaka")
+plot(img_ad[,4:ncol(img_ad)])
+```
+
+```{r}
+ggplot(img_ad, aes(x = `インプレッション`)) +
+  geom_histogram()
+```
+
+
+```{r}
+ggplot(img_ad, aes(x = log10(`インプレッション`))) +
+  geom_histogram()
+```
+
+
+
